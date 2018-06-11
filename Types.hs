@@ -3,7 +3,7 @@ module Types (
     Proposition
   , Action
   , Mutex
-  , Graph
+  , PlanGraph
   -- propositions interface
   , neg
   -- action interface
@@ -19,22 +19,26 @@ module Types (
   -- action level interface
   , aLvl
   -- graph interface
+  , initPlanGraph
   , lastFactLevel
   , addLevel
   ) where
+
+import qualified Set
+import Set (Set)
 
 type PropTag = Integer
 data Proposition = Pos PropTag | Neg PropTag
   deriving (Eq, Ord)
 type Precondition = Proposition
 type Effect = Proposition
-data ActTag = String
+type ActTag = String
 data Action = A ActTag (Set Precondition) (Set Effect)
 -- type ParamAction = (Var -> GroundedVar) -> Action
 type Mutex a = (a,a)
 data FactLevel = FLevel (Set Proposition) (Set (Mutex Proposition))
 data ActionLevel = ALevel (Set Action) (Set (Mutex Action))
-data Graph = G [(ActionLevel, FactLevel)] FactLevel
+data PlanGraph = PG [(ActionLevel, FactLevel)] FactLevel
 
 neg :: Proposition -> Proposition
 neg (Pos p) = Neg p
@@ -73,9 +77,12 @@ getFLvlMutexes (FLevel _ ms) = ms
 aLvl :: Set Action -> Set (Mutex Action) -> ActionLevel
 aLvl = ALevel
 
-lastFactLevel :: Graph -> FactLevel
-lastFactLevel (G [] f) = f
-lastFactLevel (G ((_,f):_) _) = f
+initGraph :: Set Proposition -> PlanGraph
+initGraph ps = PG [] $ fLvl ps Set.empty
 
-addLevel :: ActionLevel -> FactLevel -> Graph -> Graph
-addLevel al fl (G f ls) -> G f $ (al,fl) : ls
+lastFactLevel :: PlanGraph -> FactLevel
+lastFactLevel (PG [] f) = f
+lastFactLevel (PG ((_,f):_) _) = f
+
+addLevel :: ActionLevel -> FactLevel -> PlanGraph -> PlanGraph
+addLevel al fl (PG f ls) -> PG f $ (al,fl) : ls
