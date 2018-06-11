@@ -4,6 +4,8 @@ module Types (
   , Action
   , Mutex
   , Graph
+  -- propositions interface
+  , neg
   -- action interface
   , preconds
   , effects
@@ -21,7 +23,7 @@ module Types (
   , addLevel
   ) where
 
-data PropTag = Integer
+type PropTag = Integer
 data Proposition = Pos PropTag | Neg PropTag
   deriving (Eq, Ord)
 type Precondition = Proposition
@@ -33,6 +35,10 @@ type Mutex a = (a,a)
 data FactLevel = FLevel (Set Proposition) (Set (Mutex Proposition))
 data ActionLevel = ALevel (Set Action) (Set (Mutex Action))
 data Graph = G [(ActionLevel, FactLevel)] FactLevel
+
+neg :: Proposition -> Proposition
+neg (Pos p) = Neg p
+neg (Neg p) = Pos p
 
 instance Eq Action where
   (==) = (==) `on` actTag
