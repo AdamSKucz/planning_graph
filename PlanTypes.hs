@@ -1,9 +1,10 @@
-module Types (
+module PlanTypes (
   -- types
     Proposition
   , Action
   , Mutex
   , PlanGraph
+  , Plan
   -- propositions interface
   , neg
   -- action interface
@@ -26,6 +27,7 @@ module Types (
 
 import qualified Set
 import Set (Set)
+import GraphTypes
 
 type PropTag = Integer
 data Proposition = Pos PropTag | Neg PropTag
@@ -38,7 +40,8 @@ data Action = A ActTag (Set Precondition) (Set Effect)
 type Mutex a = (a,a)
 data FactLevel = FLevel (Set Proposition) (Set (Mutex Proposition))
 data ActionLevel = ALevel (Set Action) (Set (Mutex Action))
-data PlanGraph = PG [(ActionLevel, FactLevel)] FactLevel
+data PlanGraph = PG [(FactLevel, ActionLevel)] FactLevel
+type Plan = [Set Action]
 
 neg :: Proposition -> Proposition
 neg (Pos p) = Neg p
@@ -80,9 +83,12 @@ aLvl = ALevel
 initGraph :: Set Proposition -> PlanGraph
 initGraph ps = PG [] $ fLvl ps Set.empty
 
+numFactLvls :: Integral n => PlanGraph -> n
+numFactLvls (PG ls _) = 1 + length ls
+
 lastFactLevel :: PlanGraph -> FactLevel
 lastFactLevel (PG [] f) = f
-lastFactLevel (PG ((_,f):_) _) = f
+lastFactLevel (PG ((f,_):_) _) = f
 
 addLevel :: ActionLevel -> FactLevel -> PlanGraph -> PlanGraph
-addLevel al fl (PG f ls) -> PG f $ (al,fl) : ls
+addLevel al fl (PG f ls) -> PG f $ (fl,al) : ls

@@ -5,7 +5,7 @@ module Expansion (
 import qualified Set
 import Set (Set, union, cartesianProduct, unions)
 
-import Types
+import PlanTypes
 
 {-
 generate and test approach
@@ -58,7 +58,7 @@ expandGraph allActions = do
   lastLevel <- gets lastFactLevel
   let propositions = getFLvlProps lastLevel
   let mutexes = getFLvlMutexes lastLevel
-  let nextActions = filter precondSatisfiable allActions
+  let nextActions = Set.filter precondSatisfiable allActions
   let nextProps = propositions `union` unions (fmap effects nextActions)
   let actionMutexes = getActionMutexes mutexes nextActions
   let propMutexes = getPropMutexes nextActions actionMutexes nextProps

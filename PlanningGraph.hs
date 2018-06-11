@@ -1,3 +1,9 @@
+module PlanningGraph (
+    graphPlan
+  ) where
+
+import PlanTypes
+
 graphPlan :: MonadState Graph m => m (Maybe Plan) -- described on slide 273
 graphPlan = do
   currentLevel <- gets getCurrentLevel
