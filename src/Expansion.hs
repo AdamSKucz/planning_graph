@@ -2,8 +2,8 @@ module Expansion (
     expandGraph
   ) where
 
-import qualified Set
-import Set (Set, union, cartesianProduct, unions)
+import qualified Data.Set as Set
+import Data.Set (Set, union, cartesianProduct, unions)
 
 import PlanTypes
 

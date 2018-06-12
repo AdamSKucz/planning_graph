@@ -39,7 +39,7 @@ attemptPlanExtraction ::
 attemptPlanExtraction goals = do
   g <- get
   let maxN = numFactLvls g - 1
-  let soln = graphBFS g (maxN, goals) ((==0) . fst)
+  let soln = graphDFS g (maxN, goals) ((==0) . fst)
   case soln of
     Just s  -> return . Left $ fmap third' s
     Nothing ->

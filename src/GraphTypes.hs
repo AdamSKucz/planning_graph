@@ -1,15 +1,13 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module GraphTypes (
-    Graph
+    Graph(..)
   ) where
 
-fst' :: (a,b,c) -> a
-fst' (a,_,_) = a
+import Data.List (minimumBy)
+import Data.Ord (comparing)
 
-snd' :: (a,b,c) -> b
-snd' (_,b,_) = b
-
-third' :: (a,b,c) -> c
-third' (_,_,c) = c
+import Util (fst')
 
 class Eq v => Graph v e g where
   edgesFrom :: Integral n => g -> v -> [(v, n, e)]
