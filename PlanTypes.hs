@@ -39,7 +39,9 @@ data Action = A ActTag (Set Precondition) (Set Effect)
 -- type ParamAction = (Var -> GroundedVar) -> Action
 type Mutex a = (a,a)
 data FactLevel = FLevel (Set Proposition) (Set (Mutex Proposition))
+  deriving (Eq)
 data ActionLevel = ALevel (Set Action) (Set (Mutex Action))
+  deriving (Eq)
 data PlanGraph = PG [(FactLevel, ActionLevel)] FactLevel
 type Plan = [Set Action]
 
@@ -89,6 +91,10 @@ numFactLvls (PG ls _) = 1 + length ls
 lastFactLevel :: PlanGraph -> FactLevel
 lastFactLevel (PG [] f) = f
 lastFactLevel (PG ((f,_):_) _) = f
+
+getFactLevel :: Integral n => PlanGraph -> n -> FactLevel
+getFactLevel (PG _ f) 0 = f
+getFactLevel g@(PG ls _) n = fst $ ls !! (numFactLvls g - 1 - n)
 
 addLevel :: ActionLevel -> FactLevel -> PlanGraph -> PlanGraph
 addLevel al fl (PG f ls) -> PG f $ (fl,al) : ls
