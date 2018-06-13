@@ -2,16 +2,16 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 21c70115bdb1ea66d71751edc3d3e45fcc2e506587e27198afe7c1cfaa201308
+-- hash: 72b3c19bb28a1e98c3851089d4267caf3a47701f99664aca6e91d2ee06248147
 
 name:           planning-graph
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/planning-graph#readme>
-homepage:       https://github.com/githubuser/planning-graph#readme
-bug-reports:    https://github.com/githubuser/planning-graph/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2018 Author name here
+homepage:       https://github.com/adam-kucz/planning-graph#readme
+bug-reports:    https://github.com/adam-kucz/planning-graph/issues
+author:         Adam Kucz
+maintainer:     -
+copyright:      2018 Adam Kucz
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -22,17 +22,26 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/planning-graph
+  location: https://github.com/adam-kucz/planning-graph
 
 library
   exposed-modules:
-      Lib
+      Expansion
+      Extraction
+      GraphTypes
+      Interface
+      PlanningGraph
+      PlanTypes
+      Search
+      Util
   other-modules:
       Paths_planning_graph
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , containers >=0.5.11
+    , mtl
   default-language: Haskell2010
 
 executable planning-graph-exe
@@ -44,6 +53,8 @@ executable planning-graph-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers >=0.5.11
+    , mtl
     , planning-graph
   default-language: Haskell2010
 
@@ -57,5 +68,7 @@ test-suite planning-graph-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers >=0.5.11
+    , mtl
     , planning-graph
   default-language: Haskell2010

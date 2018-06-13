@@ -1,6 +1,11 @@
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
+
 module Extraction (
     attemptPlanExtraction
   ) where
+
+import qualified Data.Set as Set
+import Data.Set (Set, member, notMember, unions, powerSet, cartesianProduct)
 
 import PlanTypes
 import GraphTypes
@@ -13,9 +18,10 @@ instance Graph (Int, Set Proposition) (Set Action) PlanGraph where
       then []
       else
         fmap (\as -> ((n-1, setPreconds as), 1, as)) .
-        Set.filter setAdmissible .
+        filter setAdmissible .
+        Set.toList $
         powerSet actions
-    where alvl = getActionLevel g n
+    where alvl = getActLevel g n
           actions = getALvlActions alvl
           actMutexes = getALvlMutexes alvl
           preMutexes = getFLvlMutexes $ getFactLevel g (n-1)
@@ -23,26 +29,31 @@ instance Graph (Int, Set Proposition) (Set Action) PlanGraph where
           setEffects  = unions . fmap effects  . Set.toList
           setAdmissible as = all ($ as) [noMutex, noMutexPreconds, achieve props]
           noMutex as =
-            all ((`notMember` actMutexes) . mutex) $
+            all ((`notMember` actMutexes) . uncurry mutex) $
             cartesianProduct actions actions
           noMutexPreconds as = all ok actions
             where ok a =
                     let ps = preconds a
-                    in all ((`notMember` preMutexes) . mutex) $
+                    in all ((`notMember` preMutexes) . uncurry mutex) $
                        cartesianProduct ps ps
           achieve props as = all (`member` setEffects as) props
 
+{-
+result represents whether a decision was reached
+Left () means no decision
+Right Nothing means a decision that no plan exists
+Right (Just plan) means a plan was found
+-}
 attemptPlanExtraction ::
-  MonadState PlanGraph m =>
+  PlanGraph ->
   Set Proposition ->
-  m (Either (Maybe Plan) ())
-attemptPlanExtraction goals = do
-  g <- get
+  Either () (Maybe Plan)
+attemptPlanExtraction g goals =
   let maxN = numFactLvls g - 1
-  let soln = graphDFS g (maxN, goals) ((==0) . fst)
-  case soln of
-    Just s  -> return . Left $ fmap third' s
+  in let soln = graphDFS g (maxN, goals) ((==0) . fst)
+  in case soln of
+    Just s  -> Right . Just $ fmap third' s
     Nothing ->
       if maxN > 0 && getFactLevel g maxN == getFactLevel g (maxN - 1)
-      then return $ Left Nothing
-      else return $ Right ()
+      then Right Nothing
+      else Left ()

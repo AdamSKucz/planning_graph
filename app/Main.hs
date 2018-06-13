@@ -1,6 +1,7 @@
 module Main where
 
-import Lib
+import Interface
+import PlanningGraph
 
 main :: IO ()
-main = someFunc
+main = putStrLn "It compiles"

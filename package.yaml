@@ -1,10 +1,10 @@
 name:                planning-graph
 version:             0.1.0.0
-github:              "githubuser/planning-graph"
+github:              "adam-kucz/planning-graph"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2018 Author name here"
+author:              "Adam Kucz"
+maintainer:          "-"
+copyright:           "2018 Adam Kucz"
 
 extra-source-files:
 - README.md
@@ -21,6 +21,8 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- containers >= 0.5.11
+- mtl
 
 library:
   source-dirs: src

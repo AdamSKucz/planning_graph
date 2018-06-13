@@ -1,9 +1,13 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Expansion (
     expandGraph
   ) where
 
+import Control.Monad.State.Class (MonadState, gets, modify)
+
 import qualified Data.Set as Set
-import Data.Set (Set, union, cartesianProduct, unions)
+import Data.Set (Set, member, union, cartesianProduct, unions)
 
 import PlanTypes
 
@@ -24,9 +28,10 @@ actionMutexes mutexes actions =
         conflict pas = any (\pb -> any (==pb) $ Set.map neg pas)
         effectsConflict (a, b) = conflict (effects a) (effects b)
         effectPrecondConflict (a, b) =
-          conflict (effects a, preconds b) || conflict (effects b, preconds a)
+          conflict (effects a) (preconds b) || conflict (effects b) (preconds a)
+        precondConflict :: (Action, Action) -> Bool
         precondConflict (a, b) = 
-          any ((`member` mutexes) . mutex) $
+          any ((`member` mutexes) . uncurry mutex) $
           cartesianProduct (preconds a) (preconds b)
 
 {-
@@ -45,7 +50,7 @@ propMutexes actions actionMutexes props =
         negation (p,p') = p == neg p'
         mutexActions (p,p') =
           let sources k = Set.filter (member k . effects) actions
-          in all ((`member` actionMutexes) . mutex) $
+          in all ((`member` actionMutexes) . uncurry mutex) $
              cartesianProduct (sources p) (sources p')
 
 {-
@@ -53,14 +58,15 @@ two-pass approach
 in first pass get all actions and facts for the next level
 in the second pass find all mutexes for those actions and facts
 -}
-expandGraph :: MonadState Graph m => Set Action -> m ()
+expandGraph :: MonadState PlanGraph m => Set Action -> m ()
 expandGraph allActions = do
   lastLevel <- gets lastFactLevel
   let propositions = getFLvlProps lastLevel
   let mutexes = getFLvlMutexes lastLevel
+  let precondSatisfiable = all (`elem` propositions) . preconds
   let nextActions = Set.filter precondSatisfiable allActions
-  let nextProps = propositions `union` unions (fmap effects nextActions)
-  let actionMutexes = getActionMutexes mutexes nextActions
-  let propMutexes = getPropMutexes nextActions actionMutexes nextProps
-  modify $ addLevel (aLvl nextActions actionMutexes) (fLvl nextProps propMutexes)
-  where precondSatisfiable = all (`elem` propositions) . preconds
+  let nextProps =
+        propositions `union` unions (fmap effects $ Set.toList  nextActions)
+  let aMutexes = actionMutexes mutexes nextActions
+  let pMutexes = propMutexes nextActions aMutexes nextProps
+  modify $ addLevel (aLvl nextActions aMutexes) (fLvl nextProps pMutexes)

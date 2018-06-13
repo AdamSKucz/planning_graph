@@ -21,8 +21,13 @@ module PlanTypes (
   , getFLvlMutexes
   -- action level interface
   , aLvl
+  , getALvlActions
+  , getALvlMutexes
   -- graph interface
   , initPlanGraph
+  , numFactLvls
+  , getActLevel
+  , getFactLevel
   , lastFactLevel
   , addLevel
   ) where
@@ -94,6 +99,12 @@ getFLvlMutexes (FLevel _ ms) = ms
 aLvl :: Set Action -> Set (Mutex Action) -> ActionLevel
 aLvl = ALevel
 
+getALvlActions :: ActionLevel -> Set Action
+getALvlActions (ALevel as _) = as
+
+getALvlMutexes :: ActionLevel -> Set (Mutex Action)
+getALvlMutexes (ALevel _ ms) = ms
+
 initPlanGraph :: Set Proposition -> PlanGraph
 initPlanGraph ps = PG [] $ fLvl ps Set.empty
 
@@ -107,6 +118,9 @@ lastFactLevel (PG ((f,_):_) _) = f
 getFactLevel :: PlanGraph -> Int -> FactLevel
 getFactLevel (PG _ f) 0 = f
 getFactLevel g@(PG ls _) n = fst $ ls !! (numFactLvls g - 1 - n)
+
+getActLevel :: PlanGraph -> Int -> ActionLevel
+getActLevel g@(PG ls _) n = snd $ ls !! (numFactLvls g - 1 - n)
 
 addLevel :: ActionLevel -> FactLevel -> PlanGraph -> PlanGraph
 addLevel al fl (PG ls f) = PG ((fl,al) : ls) f
