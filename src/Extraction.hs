@@ -5,11 +5,11 @@ module Extraction (
   ) where
 
 import qualified Data.Set as Set
-import Data.Set (Set, member, notMember, unions, powerSet, cartesianProduct)
+import Data.Set (Set, member, notMember, unions)
 
 import PlanTypes
 import GraphTypes
-import Util (third')
+import Util (third', powerSet, cartesianProduct)
 import Search
 
 instance Graph (Int, Set Proposition) (Set Action) PlanGraph where

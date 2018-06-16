@@ -8,8 +8,9 @@ import Control.Monad.Reader.Class (MonadReader, ask)
 import Control.Monad.State.Class (MonadState, get)
 
 import qualified Data.Set as Set
-import Data.Set (Set, member, cartesianProduct)
+import Data.Set (Set, member)
 
+import Util (cartesianProduct)
 import Extraction
 import Expansion
 import PlanTypes

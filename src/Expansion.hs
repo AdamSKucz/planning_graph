@@ -7,8 +7,9 @@ module Expansion (
 import Control.Monad.State.Class (MonadState, gets, modify)
 
 import qualified Data.Set as Set
-import Data.Set (Set, member, union, cartesianProduct, unions)
+import Data.Set (Set, member, union, unions)
 
+import Util (cartesianProduct)
 import PlanTypes
 
 {-

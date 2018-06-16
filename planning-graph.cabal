@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 72b3c19bb28a1e98c3851089d4267caf3a47701f99664aca6e91d2ee06248147
+-- hash: 4d180506760753820e538f7191210ffe8e75d3ca0cd0eecc8411be8b5d4defcc
 
 name:           planning-graph
 version:        0.1.0.0
@@ -40,8 +40,9 @@ library
       src
   build-depends:
       base >=4.7 && <5
-    , containers >=0.5.11
-    , mtl
+    , containers ==0.5.*
+    , hspec ==2.4.*
+    , mtl ==2.2.*
   default-language: Haskell2010
 
 executable planning-graph-exe
@@ -53,8 +54,9 @@ executable planning-graph-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , containers >=0.5.11
-    , mtl
+    , containers ==0.5.*
+    , hspec ==2.4.*
+    , mtl ==2.2.*
     , planning-graph
   default-language: Haskell2010
 
@@ -68,7 +70,8 @@ test-suite planning-graph-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , containers >=0.5.11
-    , mtl
+    , containers ==0.5.*
+    , hspec ==2.4.*
+    , mtl ==2.2.*
     , planning-graph
   default-language: Haskell2010

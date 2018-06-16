@@ -10,7 +10,6 @@
 #
 # resolver: lts-3.5
 # resolver: nightly-2015-09-21
-resolver: ghc-8.4.3
 # resolver: ghcjs-0.1.0_ghc-7.10.2
 #
 # The location of a snapshot can be provided as a file or url. Stack assumes
@@ -39,7 +38,8 @@ packages:
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
 extra-deps:
-- containers-0.5.11.0
+# - containers-0.5.11.0
+# - ghc-8.4.3
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

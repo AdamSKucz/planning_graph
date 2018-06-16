@@ -1,6 +1,13 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Interface (
-                 ) where
+  -- predicates
+    predicate
+  -- grounding
+  , createFactSet
+  , createActionSet
+  -- testing
+  , paramAction
+  ) where
 
 import qualified Data.Foldable as Foldable
 
@@ -67,10 +74,20 @@ instance (Parametrised a, Ord a) => Parametrised (Set a) where
   freeVars = Set.unions . fmap freeVars . Set.toList
   ground = Set.map . ground
 
+predicate :: PredTag -> [Var] -> Predicate
+predicate = Pos
+
+instance Negatable Predicate where
+  neg (Pos t vs) = Neg t vs
+  neg (Neg t vs) = Pos t vs
+
 castToProp :: Predicate -> Maybe Proposition
 castToProp (Pos t []) = return $ prop t
 castToProp (Neg t []) = return . neg $ prop t
 castToProp _ = Nothing
+
+paramAction :: ActTag -> [PrecondPred] -> [EffectPred] -> ParamAction
+paramAction t pre eff = PA t (Set.fromList pre) (Set.fromList eff)
 
 castToAction :: ParamAction -> Maybe Action
 castToAction (PA t pre eff) = do
@@ -88,12 +105,17 @@ createFactSet :: Set VarValue -> Set Predicate -> Set Proposition
 createFactSet values predicates =
   Set.fromList .
   Maybe.mapMaybe castToProp $
-  Set.toList predicates >>= allInstances values
+  do
+    p <- Set.toList predicates
+    prop <- allInstances values p
+    [prop, neg prop]
+
 
 {-
 given a set of propositions, possible variable values and actions
 instantiates all variables in actions to ground instances,
 adds null actions for all propositions
+removes actions with inconsistent preconditions or effects
 and returns a set of all possible resulting actions
 -}
 createActionSet ::
@@ -103,9 +125,12 @@ createActionSet ::
 createActionSet props values pActions =
   union nullActions $
   Set.fromList .
+  filter (\a -> not $ conflicting (preconds a) || conflicting (effects a)) .
   Maybe.mapMaybe castToAction $
   Set.toList pActions >>= allInstances values
   where nullActions = Set.map makeNullAction props
+        conflicting :: Set Proposition -> Bool
+        conflicting ps = any (\p -> neg p `Set.member` ps) ps 
 
 makeNullAction :: Proposition -> Action
 makeNullAction p =

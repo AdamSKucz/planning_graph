@@ -1,6 +1,8 @@
 module PlanTypes (
+  -- classes
+    Negatable
   -- types
-    Proposition
+  , Proposition
   , Action
   , Mutex
   , PlanGraph
@@ -56,12 +58,15 @@ data ActionLevel = ALevel (Set Action) (Set (Mutex Action))
 data PlanGraph = PG [(FactLevel, ActionLevel)] FactLevel
 type Plan = [Set Action]
 
+class Negatable a where
+  neg :: a -> a
+
 prop :: PropTag -> Proposition
 prop = Pos
 
-neg :: Proposition -> Proposition
-neg (Pos p) = Neg p
-neg (Neg p) = Pos p
+instance Negatable Proposition where
+  neg (Pos p) = Neg p
+  neg (Neg p) = Pos p
 
 -- instance Eq Action where
 --   (==) = (==) `on` actTag
